@@ -113,7 +113,10 @@ function checkConfirmPasswordValidity() {
     confirmPasswordError.textContent = "";
     errorBorder(confirmPassword, confirmPasswordError);
     errorBorder(password, passwordError);
-  } else {
+  } else if (
+    confirmPassword.value === password.value &&
+    checkPasswordValidity() === true
+  ) {
     validBorder(confirmPassword, confirmPasswordError);
     validBorder(password, passwordError);
     return true;
@@ -155,18 +158,20 @@ function checkForm(event) {
     checkPasswordValidity() === true &&
     checkConfirmPasswordValidity() === true
   ) {
-    const h1 = document.querySelector("h1");
-    const fieldsets = document.querySelectorAll("fieldset");
-    h1.classList.add("opacity-0");
-    fieldsets.forEach((fieldset) => fieldset.classList.add("opacity-0"));
     setTimeout(() => {
-      h1.classList.add("display-none");
-      fieldsets.forEach((fieldset) => fieldset.classList.add("display-none"));
+      const h1 = document.querySelector("h1");
+      const fieldsets = document.querySelectorAll("fieldset");
+      h1.classList.add("opacity-0");
+      fieldsets.forEach((fieldset) => fieldset.classList.add("opacity-0"));
+      setTimeout(() => {
+        h1.classList.add("display-none");
+        fieldsets.forEach((fieldset) => fieldset.classList.add("display-none"));
+      }, 500);
+      setTimeout(getGif, 500);
+      setTimeout(() => {
+        img.classList.add("opacity");
+      }, 1000);
     }, 500);
-    setTimeout(getGif, 500);
-    setTimeout(() => {
-      img.classList.add("opacity");
-    }, 1000);
   }
 }
 
