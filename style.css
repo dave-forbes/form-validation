@@ -206,6 +206,7 @@ img {
   aspect-ratio: 1;
   opacity: 0;
   transition: opacity 1.5s;
+  border-radius: 7px;
 }
 
 .center {
