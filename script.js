@@ -51,7 +51,10 @@ postCode.addEventListener("change", checkPostCodeValidity);
 
 function checkPostCodeValidity() {
   const postCodeRegex = /^[\w\s\-]{0,10}$/g;
-  if (!postCodeRegex.test(postCode.value)) {
+  if (postCode.value.length === 0) {
+    postCodeError.textContent = "Please enter a post code.";
+    errorBorder(postCode, postCodeError);
+  } else if (!postCodeRegex.test(postCode.value)) {
     if (postCode.classList.contains("error-border")) return;
     postCodeError.textContent = "Please enter a valid post code.";
     errorBorder(postCode, postCodeError);
@@ -72,7 +75,10 @@ function checkPasswordValidity() {
   const numberRegex = /[0-9]/g;
   const specialRegex = /[#?!@$%^&*-]/g;
 
-  if (!upperCaseRegex.test(password.value)) {
+  if (password.value.length === 0) {
+    passwordError.textContent = "Please enter a password.";
+    errorBorder(password, passwordError);
+  } else if (!upperCaseRegex.test(password.value)) {
     passwordError.textContent = "Password must contain an uppercase letter.";
     errorBorder(password, passwordError);
   } else if (!lowerCaseRegex.test(password.value)) {
