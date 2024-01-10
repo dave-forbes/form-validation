@@ -142,61 +142,84 @@ continueButton.addEventListener("click", checkForm);
 
 function checkForm(event) {
   event.preventDefault();
-  if (checkEmailValidity() !== true) {
+
+  const isEmailValid = checkEmailValidity();
+  const isCountryValid = checkCountryValidity();
+  const isPostCodeValid = checkPostCodeValidity();
+  const isPasswordValid = checkPasswordValidity();
+  const isConfirmPasswordValid = checkConfirmPasswordValidity();
+
+  if (!isEmailValid) {
     errorBoxShadow(email);
   }
-  if (checkCountryValidity() !== true) {
+  if (!isCountryValid) {
     errorBoxShadow(country);
   }
-  if (checkPostCodeValidity() !== true) {
+  if (!isPostCodeValid) {
     errorBoxShadow(postCode);
   }
-  if (checkPasswordValidity() !== true) {
+  if (!isPasswordValid) {
     errorBoxShadow(password);
   }
-  if (checkConfirmPasswordValidity() !== true) {
+  if (!isConfirmPasswordValid) {
     errorBoxShadow(confirmPassword);
   }
   if (
-    checkEmailValidity() === true &&
-    checkCountryValidity() === true &&
-    checkPostCodeValidity() === true &&
-    checkPasswordValidity() === true &&
-    checkConfirmPasswordValidity() === true
+    isEmailValid &&
+    isCountryValid &&
+    isPostCodeValid &&
+    isPasswordValid &&
+    isConfirmPasswordValid
   ) {
-    setTimeout(() => {
-      const h1 = document.querySelector("h1");
-      const fieldsets = document.querySelectorAll("fieldset");
-      h1.classList.add("opacity-0");
-      fieldsets.forEach((fieldset) => fieldset.classList.add("opacity-0"));
-      setTimeout(() => {
-        h1.classList.add("display-none");
-        fieldsets.forEach((fieldset) => fieldset.classList.add("display-none"));
-      }, 500);
-      setTimeout(getGif, 500);
-      setTimeout(() => {
-        img.classList.add("opacity");
-      }, 1000);
-    }, 500);
+    setTimeout(runAnimations, 500);
   }
 }
 
-const errorText = document.querySelector("#error-text");
-const img = document.querySelector("img");
-const form = document.querySelector("form");
+function runAnimations() {
+  const h1 = document.querySelector("h1");
+  const fieldsets = document.querySelectorAll("fieldset");
+  //fade title and fields out
+  h1.classList.add("opacity-0");
+  fieldsets.forEach((fieldset) => fieldset.classList.add("opacity-0"));
+  //once faded out remove from dom
+  setTimeout(() => {
+    h1.classList.add("display-none");
+    fieldsets.forEach((fieldset) => fieldset.classList.add("display-none"));
+  }, 500);
+  //run fetch request for gif
+  setTimeout(getGifAsync, 500);
+  //fade in img
+  setTimeout(() => {
+    const img = document.querySelector("img");
+    img.classList.add("opacity");
+  }, 1000);
+}
 
-function getGif() {
-  errorText.textContent = "";
-  url = `https://api.giphy.com/v1/gifs/translate?api_key=HoD2pa83gqhBgOyTwrRksdv4jRni17Mv&s=${"well done"}`;
-  fetch(url, { mode: "cors" })
-    .then((response) => response.json())
-    .then((response) => (img.src = response.data.images.original.url))
-    .then(img.classList.remove("display-none"))
-    .then(form.classList.add("center"))
-    .catch((error) => {
-      errorText.textContent = "Couldn't find any gifs...";
-      errorText.style.color = "red";
-      errorText.classList.remove("display-none");
-      console.error("An error occurred:", error);
+async function getGifAsync() {
+  const errorText = document.querySelector("#error-text");
+  const img = document.querySelector("img");
+  const form = document.querySelector("form");
+  const url = `https://api.giphy.com/v1/gifs/translate?api_key=HoD2pa83gqhBgOyTwrRksdv4jRni17Mv&s=${"well done"}`;
+
+  try {
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Request timed out")), 1000);
     });
+
+    const responsePromise = fetch(url);
+
+    const response = await Promise.race([timeoutPromise, responsePromise]);
+
+    const json = await response.json();
+
+    img.src = json.data.images.original.url;
+    img.classList.remove("display-none");
+  } catch (error) {
+    errorText.textContent = error;
+    errorText.style.color = "red";
+    errorText.classList.remove("display-none");
+    console.error("An error occurred:", error);
+  } finally {
+    form.classList.add("center");
+  }
 }
